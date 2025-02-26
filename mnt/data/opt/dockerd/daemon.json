@@ -1,0 +1,1 @@
+{ "data-root": "/mnt/data/opt/dockerd/docker", "iptables": false, "ip6tables": false, "log-level": "warn", "log-driver": "json-file", "log-opts": { "max-size": "50m", "max-file": "2" } }

@@ -1,0 +1,13 @@
+service dockerd /vendor/bin/hw/dockerd.sh
+    class main
+    user root
+    group root
+    disabled
+
+on boot
+    # mkdir /mnt/data 0555 root root
+    # mount ext4 /dev/block/nvme0n1p1 /mnt/data
+    symlink /mnt/media_rw/d1712c33-5a26-4221-a208-0bacc20d3511 /mnt/data
+
+on property:sys.boot_completed=1
+    start dockerd
