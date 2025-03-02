@@ -177,5 +177,6 @@ docker: Error response from daemon: failed to create task for container: failed 
 
 dockerd（runc）目前好像还不能使用 noprefix 的 cpuset，临时方案可以 `umount /sys/fs/cgroup/cpuset` 禁用此功能。
 
+更好的方案是：修改内核，让 cpuset 以 noprefix 挂载时，依然提供 `cpuset.cpus`，使其软链接到 `cpus`，或者反过来。
 
 

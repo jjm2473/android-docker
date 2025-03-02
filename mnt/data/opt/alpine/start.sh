@@ -21,6 +21,7 @@ if ! [ -e "$TARGET_ROOTFS/proc/cgroups" ]; then
 	mount --bind /dev "$TARGET_ROOTFS/dev"
 	mount -t tmpfs tmpfs "$TARGET_ROOTFS/tmp"
 	mount -t sysfs sysfs "$TARGET_ROOTFS/sys"
+#begin cgroupfs mounting
 #cgroupfs v2
 	# mount -t cgroup2 none "$TARGET_ROOTFS/sys/fs/cgroup"
 #cgroupfs v1
@@ -35,7 +36,10 @@ if ! [ -e "$TARGET_ROOTFS/proc/cgroups" ]; then
 	done
 
 	# cpuset mount with noprefix will cause docker run fail
-	umount "$TARGET_ROOTFS/sys/fs/cgroup/cpuset"
+	[ -e "$TARGET_ROOTFS/sys/fs/cgroup/cpuset/cpuset.cpus" ] || {
+		umount "$TARGET_ROOTFS/sys/fs/cgroup/cpuset" 2>/dev/null
+		rmdir "$TARGET_ROOTFS/sys/fs/cgroup/cpuset" 2>/dev/null
+	}
 #end cgroupfs mounting
 
 	mount -t proc proc "$TARGET_ROOTFS/proc"
