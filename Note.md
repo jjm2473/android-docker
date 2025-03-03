@@ -181,14 +181,15 @@ dockerd（runc）目前好像还不能使用 noprefix 的 cpuset，临时方案�
 
 ```patch
 diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
-index 684c16849..cb8e5eb93 100644
+index 684c16849..e45ce45cf 100644
 --- a/kernel/cgroup/cgroup.c
 +++ b/kernel/cgroup/cgroup.c
-@@ -3949,6 +3949,11 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
+@@ -3949,6 +3949,12 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
  		spin_unlock_irq(&cgroup_file_kn_lock);
  	}
  
-+	if (cgrp->root->flags & CGRP_ROOT_NOPREFIX) {
++	if (cft->ss && !(cft->flags & CFTYPE_NO_PREFIX) &&
++	    (cgrp->root->flags & CGRP_ROOT_NOPREFIX)) {
 +		snprintf(name, CGROUP_FILE_NAME_MAX, "cpuset.%s", cft->name);
 +		kernfs_create_link(cgrp->kn, name, kn);
 +	}
