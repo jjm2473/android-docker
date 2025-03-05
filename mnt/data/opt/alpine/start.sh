@@ -17,8 +17,26 @@ if ! [ -e "$TARGET_ROOTFS/proc/cgroups" ]; then
 
 	mkdir -p "$TARGET_ROOTFS"
 	mount --bind rootfs "$TARGET_ROOTFS"
+	busybox mount --make-slave "$TARGET_ROOTFS"
+	mkdir "$TARGET_ROOTFS/storage"
 	mount --rbind /mnt "$TARGET_ROOTFS/mnt"
+	busybox mount --make-rslave "$TARGET_ROOTFS/mnt"
+	mount --rbind /storage "$TARGET_ROOTFS/storage"
+	busybox mount --make-rslave "$TARGET_ROOTFS/storage"
+	rm -rf "$TARGET_ROOTFS/sdcard"
+	if [ -L /sdcard ]; then
+		cp -a /sdcard "$TARGET_ROOTFS/"
+	else
+		mkdir "$TARGET_ROOTFS/sdcard"
+		mount --rbind /sdcard "$TARGET_ROOTFS/sdcard"
+		busybox mount --make-rslave "$TARGET_ROOTFS/sdcard"
+	fi
 	mount --bind /dev "$TARGET_ROOTFS/dev"
+	busybox mount --make-slave "$TARGET_ROOTFS/dev"
+	if mountpoint -q /dev/binderfs; then
+		mount --bind /dev/binderfs "$TARGET_ROOTFS/dev/binderfs"
+		busybox mount --make-slave "$TARGET_ROOTFS/dev/binderfs"
+	fi
 	mount -t tmpfs tmpfs "$TARGET_ROOTFS/tmp"
 	mount -t sysfs sysfs "$TARGET_ROOTFS/sys"
 #begin cgroupfs mounting
