@@ -199,3 +199,75 @@ index 684c16849..e45ce45cf 100644
  
 ```
 
+
+### 非 chroot 情况下，使用`/data/local/docker/data`作为数据目录，dockerd 启动时 overlay2 测试失败
+日志：
+```
+ERRO[2025-03-05T02:45:58.375341500Z] failed to mount overlay: invalid argument     storage-driver=overlay2
+```
+
+strace：
+```
+[pid  2157] mkdirat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711", 0700) = 0
+[pid  2157] mkdirat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711/lower1", 0755 <unfinished ...>
+[pid  2158] <... nanosleep resumed> NULL) = 0
+[pid  2158] nanosleep({tv_sec=0, tv_nsec=2560000},  <unfinished ...>
+[pid  2157] <... mkdirat resumed> )     = 0
+[pid  2157] mkdirat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711/lower2", 0755) = 0
+[pid  2157] mkdirat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711/upper", 0755) = 0
+[pid  2157] mkdirat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711/work", 0755 <unfinished ...>
+[pid  2158] <... nanosleep resumed> NULL) = 0
+[pid  2158] nanosleep({tv_sec=0, tv_nsec=5120000},  <unfinished ...>
+[pid  2157] <... mkdirat resumed> )     = 0
+[pid  2157] mkdirat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711/merged", 0755) = 0
+[pid  2157] mount("overlay", "/data/local/docker/data/check-overlayfs-support3127762711/merged", "overlay", 0, "lowerdir=/data/local/docker/data"...) = -1 EINVAL (Invalid argument)
+[pid  2157] unlinkat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711", 0) = -1 EISDIR (Is a directory)
+[pid  2157] unlinkat(AT_FDCWD, "/data/local/docker/data/check-overlayfs-support3127762711", AT_REMOVEDIR) = -1 ENOTEMPTY (Directory not empty)
+```
+
+可能是安卓的`/data`挂载点的特殊设置导致的问题，将dockerd的数据目录设置成其他位置即可。
+
+
+### 非chroot环境下，安卓的ssl证书问题
+docker pull失败，出现证书问题：
+```
+WARN[2025-03-05T03:31:31.950865512Z] Error getting v2 registry: Get "https://registry-1.docker.io/v2/": tls: failed to verify certificate: x509: certificate signed by unknown authority 
+ERRO[2025-03-05T03:31:31.956496429Z] Handler for POST /v1.48/images/create returned error: Get "https://registry-1.docker.io/v2/": tls: failed to verify certificate: x509: certificate signed by unknown authority 
+```
+
+strace：
+```
+[pid  2946] openat(AT_FDCWD, "/etc/ssl/certs/ca-certificates.crt", O_RDONLY|O_CLOEXEC <unfinished ...>
+[pid  2925] <... nanosleep resumed> NULL) = 0
+[pid  2925] nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+[pid  2946] <... openat resumed> )      = -1 ENOENT (No such file or directory)
+[pid  2946] openat(AT_FDCWD, "/etc/pki/tls/certs/ca-bundle.crt", O_RDONLY|O_CLOEXEC <unfinished ...>
+[pid  2925] <... nanosleep resumed> NULL) = 0
+[pid  2946] <... openat resumed> )      = -1 ENOENT (No such file or directory)
+[pid  2925] nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+[pid  2946] openat(AT_FDCWD, "/etc/ssl/ca-bundle.pem", O_RDONLY|O_CLOEXEC <unfinished ...>
+[pid  2925] <... nanosleep resumed> NULL) = 0
+[pid  2925] epoll_pwait(4,  <unfinished ...>
+[pid  2946] <... openat resumed> )      = -1 ENOENT (No such file or directory)
+[pid  2925] <... epoll_pwait resumed> [{EPOLLOUT, {u32=1377304584, u64=33937230927495176}}], 128, 0, NULL, 0) = 1
+[pid  2946] openat(AT_FDCWD, "/etc/pki/tls/cacert.pem", O_RDONLY|O_CLOEXEC <unfinished ...>
+[pid  2925] nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+[pid  2946] <... openat resumed> )      = -1 ENOENT (No such file or directory)
+[pid  2925] <... nanosleep resumed> NULL) = 0
+[pid  2925] nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+[pid  2946] openat(AT_FDCWD, "/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem", O_RDONLY|O_CLOEXEC <unfinished ...>
+[pid  2925] <... nanosleep resumed> NULL) = 0
+[pid  2946] <... openat resumed> )      = -1 ENOENT (No such file or directory)
+[pid  2925] nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+[pid  2946] openat(AT_FDCWD, "/etc/ssl/cert.pem", O_RDONLY|O_CLOEXEC <unfinished ...>
+[pid  2925] <... nanosleep resumed> NULL) = 0
+[pid  2946] <... openat resumed> )      = -1 ENOENT (No such file or directory)
+[pid  2925] nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+[pid  2946] openat(AT_FDCWD, "/etc/ssl/certs", O_RDONLY|O_CLOEXEC <unfinished ...>
+[pid  2925] <... nanosleep resumed> NULL) = 0
+[pid  2946] <... openat resumed> )      = -1 ENOENT (No such file or directory)
+[pid  2925] nanosleep({tv_sec=0, tv_nsec=20000},  <unfinished ...>
+[pid  2946] openat(AT_FDCWD, "/etc/pki/tls/certs", O_RDONLY|O_CLOEXEC) = -1 ENOENT (No such file or directory)
+```
+
+从其他系统拷贝`/etc/ssl/certs/ca-certificates.crt`即可，为方便更新，采用overlay挂载到`/system/etc`。
