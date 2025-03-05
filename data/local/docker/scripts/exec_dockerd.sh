@@ -12,6 +12,7 @@ if [ -z "$DOCKER_DATA_ROOT" ]; then
 	if [ -n "$NVME" ]; then
 		DOCKER_DATA_ROOT="$NVME/opt/dockerd/docker"
 		mkdir -p "$DOCKER_DATA_ROOT"
+		touch "$NVME/opt/.nomedia"
 	fi
 fi
 
