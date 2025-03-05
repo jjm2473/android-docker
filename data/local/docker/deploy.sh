@@ -13,4 +13,5 @@ curl https://dl-cdn.alpinelinux.org/alpine/v3.21/main/aarch64/ca-certificates-bu
 	tar -xz etc/ssl/certs/ca-certificates.crt
 }
 
+adb root
 adb push ../docker /data/local/

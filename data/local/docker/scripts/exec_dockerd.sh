@@ -16,6 +16,7 @@ if [ -z "$DOCKER_DATA_ROOT" ]; then
 	fi
 fi
 
+mkdir "$DOCKER_ROOT/data" 2>/dev/null
 if [ -z "$DOCKER_DATA_ROOT" ]; then
 	echo "[WARN]: NVMe ext4 mountpoint not found! Use tmpfs for testing." >&2
 	mount -t tmpfs -o size=100M,uid=0,gid=0,mode=0755 tmpfs "$DOCKER_ROOT/data"
