@@ -271,3 +271,12 @@ strace：
 ```
 
 从其他系统拷贝`/etc/ssl/certs/ca-certificates.crt`即可，为方便更新，采用overlay挂载到`/system/etc`。
+
+
+### docker 的默认 bridge 网络问题
+`/data/local/docker/docker.sh run --rm -it alpine` 进入容器，容器内无法 ping 通外网，甚至无法 ping 通 172.17.0.1，容器之间互相无法 ping 通，容器外也无法 ping 通容器 IP（例如 172.17.0.2 ）。
+
+1. 路由问题，宿主虽然 main 表中有到 172.17.0.0/16 的路由，但 `ip rule` 中没有 lookup main ，执行 `ip rule add prio 20500 from all table main` 添加路由规则。另一个方案是使用 ndc 命令，但是需要指定 IP 段，`ndc network interface add local docker0; ndc network route add local docker0 172.17.0.0/16`，不推荐。
+2. IP 转发和 NAT，通过安卓的 ndc 命令添加 `ndc ipfwd add docker0 eth0 ; ndc nat enable docker0 eth0 1` 。
+3. 容器之间的互联，由于安卓默认开启了 bridge-nf-call-iptables ，防火墙的 FORWARD 链又最终 DROP，所以需要显式允许 docker0 到 docker0 的转发，执行 `iptables -A oem_fwd -i docker0 -o docker0 -j ACCEPT` 即可（ `oem_fwd` 是安卓内置的一个链）。
+
