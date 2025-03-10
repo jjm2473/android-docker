@@ -15,10 +15,13 @@ ndc ipfwd enable dockerd
 iptables -S tetherctrl_FORWARD | grep -Fqe '-i docker0 -o eth0 -g' || ndc nat enable docker0 eth0 1
 
 # Route
-# ndc network interface add local docker0
-# ndc network route add local docker0 172.17.0.0/16
+# ndc network create oem1 # oem2 , oem3 ... oem50
+# ndc network interface add oem1 docker0
+# ndc network route add oem1 docker0 172.17.0.0/16
+
 # ip rule add from all to 172.16.0.0/12 table main
 ip rule list prio 20500 from all table main | grep -Fwqs main || ip rule add prio 20500 from all table main
+
 
 # Container interconnection
 iptables -C oem_fwd -i docker0 -o docker0 -j ACCEPT 2>/dev/null || iptables -A oem_fwd -i docker0 -o docker0 -j ACCEPT
