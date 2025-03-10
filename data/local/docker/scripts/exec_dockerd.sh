@@ -5,7 +5,7 @@ busybox mount --make-slave /sys
 busybox mount --make-slave /dev
 busybox mount --make-slave /proc
 busybox mount --make-slave /data
-busybox mount --make-slave /system
+busybox mount --make-slave /system 2>/dev/null
 
 if [ -z "$DOCKER_DATA_ROOT" ]; then
 	NVME=$(mount | grep -F '/dev/block/vold/public:259,1 on /mnt/media_rw/' | grep -F ' type ext4 ' | grep -oE '/mnt/media_rw/[^ ]+')
