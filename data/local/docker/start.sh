@@ -11,7 +11,7 @@ mkdir -p "$DOCKER_ROOT/var/run"
 
 # IP forward and NAT
 ip rule list prio 21000 from all iif docker0 | grep -Fwqs docker0 || ndc ipfwd add docker0 eth0
-# ndc ipfwd enable actiontec
+ndc ipfwd enable actiontec
 iptables -S tetherctrl_FORWARD | grep -Fqe '-i docker0 -o eth0 -g' || ndc nat enable docker0 eth0 1
 
 # Route
