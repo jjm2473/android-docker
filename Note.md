@@ -5,6 +5,17 @@
 sgdisk --typecode 0:0700 /dev/block/nvme0n1
 ```
 
+### 硬盘重新分区格式化
+如果硬盘以及挂载，先用 `sm umount` 命令卸载分区，参考 https://blog.csdn.net/pwp032984/article/details/123051239 。
+
+然后执行：
+```
+sgdisk --zap-all /dev/block/nvme0n1
+sgdisk --clear /dev/block/nvme0n1
+sgdisk --new 0:0:0 --typecode=0:0700 /dev/block/nvme0n1
+mkfs.ext4 /dev/block/nvme0n1p1
+```
+
 ### chroot 启动 dockerd 情况下，docker pull hello-world 失败
 错误信息：
 ```
