@@ -6,7 +6,7 @@ sgdisk --typecode 0:0700 /dev/block/nvme0n1
 ```
 
 ### 硬盘重新分区格式化
-如果硬盘以及挂载，先用 `sm umount` 命令卸载分区，参考 https://blog.csdn.net/pwp032984/article/details/123051239 。
+如果硬盘以及挂载，先用 `sm unmount` 命令卸载分区，参考 https://blog.csdn.net/pwp032984/article/details/123051239 。
 
 然后执行：
 ```
