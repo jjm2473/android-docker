@@ -16,10 +16,12 @@ Docker run in rooted Android
 2. 电脑上执行`adb root; adb shell`打开 shell
 3. 在 shell 中执行 `/data/local/docker/start.sh`，成功的话，程序不会结束，不要关闭这个shell。
 
+这是测试用的，如果要作为产品肯定要做自动启动后台服务，这里不做探讨。
+
 # 运行容器
 1. dockerd 服务运行的情况下，电脑上执行`adb shell`打开另一个 shell
 2. shell 中执行 `/data/local/docker/docker.sh run --rm hello-world`
-（`/data/local/docker/docker.sh`是docker命令的封装，可以执行任何 docker 命令）
+（`/data/local/docker/docker.sh`是docker命令的封装，可以执行任何 docker 命令；如果要方便使用，可以设置个别名）
 
 # 问题解决
 * 启动 dockerd 服务或者运行容器如果失败了，可以检查下我的[踩坑笔记](Note.md)，或许能找到解决方案
