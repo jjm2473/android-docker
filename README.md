@@ -3,7 +3,7 @@ Docker run in rooted Android
 
 # 先决条件
 1. Root Android 设备
-2. 在 Android 设备执行这个脚本 https://github.com/moby/moby/blob/master/contrib/check-config.sh，确保“Generally Necessary”基本满足，“cgroup Controllers”可以不满足v2，因为我们用cgroup v1。
+2. 在 Android 设备上执行这个脚本 https://github.com/moby/moby/blob/master/contrib/check-config.sh ，确保“Generally Necessary”基本满足，“cgroup Controllers”可以不满足v2，因为我们用cgroup v1。
 3. 挂载个 ext4 分区，或其他 Linux 友好的文件系统 （Android 自带的 /data 可能不行）
 
 # 部署
