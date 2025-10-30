@@ -2,4 +2,4 @@
 
 . /data/local/docker/docker.env
 
-exec docker "$@"
+exec $DOCKER_ROOT/bin/docker "$@"
